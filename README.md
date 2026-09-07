@@ -68,14 +68,14 @@ def clean_pokemon_data(input_csv):
     df['stock'] = df['stock'].fillna(0).astype(int)
     
     return df
-(The complete Data Wrangling notebook is available in the .ipynb file included in this repository).
+``` (The complete Data Wrangling notebook is available in the .ipynb file included in this repository).
 
-SQL: Exploratory Data Analysis (EDA) & Validation
+### SQL: Exploratory Data Analysis (EDA) & Validation
 Before building the BI dashboard, I loaded the cleaned dataset into Google BigQuery to perform exploratory data analysis and validate business logic.
 
 Instead of pre-aggregating the data for Tableau (which would destroy the row-level granularity needed for interactive cross-filtering), I used SQL exclusively to verify data integrity, test assumptions, and establish baseline metrics.
 
-SQL
+```SQL
 -- Snippet: Validating Market Capitalization and Volume by Set (BigQuery)
 
 SELECT 
@@ -83,20 +83,22 @@ SELECT
     COUNT(title) AS total_cards_sold,
     ROUND(AVG(price_usd), 2) AS average_price_usd,
     ROUND(SUM(price_usd), 2) AS total_market_value
-FROM 
+FROM
     `practicas-sql-501604.tcg_market_intel.fct_secondary_market_pricing`
-WHERE 
-    set_name IS NOT NULL 
+WHERE
+    set_name IS NOT NULL
     AND price_usd > 0 -- Filtering out anomalies and zero-dollar listings
-GROUP BY 
+GROUP BY
     set_name
-ORDER BY 
+ORDER BY
     total_market_value DESC
 LIMIT 10;
-(The full suite of EDA queries is available in the individual SQL files included in this repository: 01_market_capitaliz.sql, 02_valuation_drivers.sql, etc.).
+```  <--- ESTAS TRES COMILLAS INVERTIDAS SON LAS QUE DEBES AGREGAR AQUÍ
 
-4. Phase 4: Analyze
-During the exploratory data analysis (EDA), several clear patterns emerged regarding how buyers interact with different card types:
+## ## 4. Phase 4: Analyze
+
+During the exploratory data analysis (EDA), several clear patterns emerged...
+```
 
 Market Liquidity: The market moves extremely fast. The overall average time a card spends listed before selling is just 3.7 Days.
 
