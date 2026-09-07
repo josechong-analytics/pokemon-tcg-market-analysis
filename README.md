@@ -129,7 +129,7 @@ I implemented a strict "Dark Mode" aesthetic using a deep midnight blue (`#06061
 * **Price vs. Liquidity (Scatter Plot):** Plots sale price against days on market. It shows that high-ticket cards (>$1,000) sell in roughly **4 days**, effectively the exact same timeframe as $200 cards.
 
 ### Dashboard Preview
-<img width="1199" height="799" alt="Dashboard 1" src="https://github.com/user-attachments/assets/574d5149-2991-4834-9708-0edc28572fb5" />
+![Tableau Dashboard](dashboard.png)
 
 
 
