@@ -62,7 +62,7 @@ def clean_pokemon_data(input_csv):
     # 6. Null imputation for inventory tracking
     df['stock'] = df['stock'].fillna(0).astype(int)
     
-    return df
+    return df ```
 
 *(The complete Data Wrangling notebook is available in the `.ipynb` file included in this repository).*
 
