@@ -31,61 +31,46 @@ I utilized the **"E-commerce Pokemon Card Pricing Data"** dataset from Kaggle (a
 * **Integrity (ROCCC):** The data is Reliable (real completed sales), Original (e-commerce API aggregation), Comprehensive (includes rarity, condition, and pricing metadata), Current, and properly Cited. All prices were normalized to USD.
 
 ---
-
 ## 3. Phase 3: Process
 
-To prepare the dataset for visualization, I engineered a data cleaning and transformation pipeline using **Python (Pandas)** and **SQL**.
+To prepare the dataset for enterprise-grade data warehousing and BI visualization, I developed a dual-stage data processing strategy using Python (Pandas & Regex).
 
-### Python Data Cleaning
-The initial cleaning phase focused on standardizing categorical variables, managing duplicates based on key identifiers, and casting financial datatypes. Key steps included enforcing compound constraints to eliminate duplicate listings, parsing monetary columns from string artifacts to float arrays, and standardizing temporal data.
+### Stage 1: Exploratory Data Cleaning & Deduplication
+In the initial processing stage (documented in `data_cleaning_process.ipynb`), I focused on auditing data quality and establishing structural integrity. 
+* **Deduplication:** Instead of relying on missing or inconsistent arbitrary IDs, I enforced a compound constraint using `subset=['title', 'card_number']` to effectively eliminate identical listing duplicates and ensure row-level uniqueness.
+* **String Normalization:** Whitespace and structural text anomalies were stripped across core fields.
+* **Type Casting:** Financial values were cleaned of string symbols and converted to float arrays, and temporal data was standardized to standard date formats.
+
+### Stage 2: Automated ETL Pipeline (BigQuery Compatibility)
+To scale the ingestion process, I engineered an automated, dynamic pipeline (documented in `etl_pipeline.ipynb`) utilizing `kagglehub` to directly orchestrate data retrieval via the Kaggle API.
 
 ```python
-# Snippet: Data Wrangling & Integrity Checks (Pandas)
-
+# Snippet: Dynamic Schema Standardization & Parsing (etl_pipeline.ipynb)
 import pandas as pd
 import numpy as np
-from google.colab import files
 
-def pokemon_cards_clean_100(input_csv):
-    print("--- STARTING PROCESS PHASE (DATA CLEANING) ---")
+def clean_pokemon_market_data(input_filepath, output_filepath):
+    df = pd.read_csv(input_filepath)
 
-    # 1. Load data
-    df = pd.read_csv(input_csv)
-    print(f"Initial raw rows loaded: {len(df)}")
+    # Schema standardization for Data Warehouse compliance
+    df.columns = (df.columns
+                  .str.strip()
+                  .str.lower()
+                  .str.replace(' ', '_', regex=False)
+                  .str.replace('[^a-z0-9_]', '', regex=True))
 
-    # 2. Remove exact duplicates based on the real identifying columns
-    df = df.drop_duplicates(subset=['title', 'card_number'], keep='first')
-    print(f"Rows remaining after removing duplicates: {len(df)}")
+    # Dynamic pricing column detection and float parsing
+    price_cols = [col for col in df.columns if 'price' in col or 'usd' in col or 'cost' in col]
+    for col in price_cols:
+        if df[col].dtype == 'object':
+            df[col] = df[col].str.replace('\$', '', regex=False).str.replace(',', '', regex=False)
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    # 3. String normalization (strip whitespace from real column names)
-    if 'pokemon_name' in df.columns:
-        df['pokemon_name'] = df['pokemon_name'].astype(str).str.strip()
-    if 'set_name' in df.columns:
-        df['set_name'] = df['set_name'].astype(str).str.strip()
-    if 'rarity_class' in df.columns:
-        df['rarity_class'] = df['rarity_class'].astype(str).str.strip()
-
-    # 4. Financial column cleanup (remove '\$' and convert to Float)
-    if 'price_usd' in df.columns:
-        df['price_usd'] = df['price_usd'].astype(str).str.replace('\$', '', regex=False)
-        df['price_usd'] = pd.to_numeric(df['price_usd'], errors='coerce')
-
-    # 5. Date formatting (Ensure YYYY-MM-DD format while preserving valid NULLs)
-    if 'release_date' in df.columns:
-        df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce').dt.strftime('%Y-%m-%d')
-    else:
-        df['release_date'] = np.nan
-
-    # 6. Integrity checks for inventory tracking
-    if 'stock' in df.columns:
-        df['stock'] = df['stock'].fillna(0).astype(int)
-    else:
-        df['stock'] = 0
-
-    return df
+    df.to_csv(output_filepath, index=False)
 ```
 
-*(The complete Data Wrangling notebook is available in the `.ipynb` file included in this repository).*
+*(Both notebooks are fully documented and available in the main directory of this repository: use `data_cleaning_process.ipynb` for the business logic validation and `etl_pipeline.ipynb` for the automated API ingestion workflow).*
+
 
 ### SQL: Exploratory Data Analysis (EDA) & Validation
 Before building the BI dashboard, I loaded the cleaned dataset into **Google BigQuery** to perform exploratory data analysis and validate business logic.
