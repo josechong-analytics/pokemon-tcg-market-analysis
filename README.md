@@ -117,9 +117,9 @@ During the exploratory data analysis (EDA), several clear patterns emerged regar
 
 To present these findings, I designed an interactive business intelligence dashboard in **Tableau Public**.
 
-[![View Interactive Dashboard](https://shields.io)](https://tableau.com)
+[![View Interactive Dashboard](https://shields.io)](https://public.tableau.com/app/profile/jos.antonio.chong.contreras/viz/Pokemon_TCG_Market_Analysis/Dashboard1)
 
-***[Click here to view the live interactive dashboard on Tableau Public](https://tableau.com)***
+***[Click here to view the live interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/jos.antonio.chong.contreras/viz/Pokemon_TCG_Market_Analysis/Dashboard1)***
 
 ### UI/UX Design Approach
 I implemented a strict "Dark Mode" aesthetic using a deep midnight blue (`#06061E`) background paired with a high-contrast Orange and dark Red/Brown palette. To keep the interface clean, maximize the data-ink ratio, and focus the user's attention directly on the data points, I systematically removed all unnecessary gridlines and axis rulers.
