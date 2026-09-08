@@ -1,14 +1,14 @@
-#  Pokémon TCG: Market Valuation & Liquidity Analysis
+# Pokémon TCG: Market Valuation & Liquidity Analysis
 ### *Data Analytics Capstone Project*
 
-##  Project Overview
-The secondary market for the Pokémon Trading Card Game (TCG) has grown into a highly active alternative asset class. However, navigating it requires moving past nostalgia and looking at actual transaction data to understand where the real financial value lies. 
+## Project Overview
+The secondary market for the Pokémon Trading Card Game (TCG) has grown into a highly active alternative asset class. However, navigating it requires moving past nostalgia and looking at actual transaction data to understand where the real financial value lies.
 
 This project follows the **Ask, Prepare, Process, Analyze, Share, Act** framework to analyze historical e-commerce transactions. The goal was to identify market liquidity patterns, compare value retention between vintage and modern sets, and quantify the actual return on investment (ROI) of third-party condition grading.
 
 ---
 
-## 🔎 1. Phase 1: Ask
+## 1. Phase 1: Ask
 
 ### The Business Problem
 A boutique investment firm wants to integrate TCG collectibles into their portfolio but needs a data-driven strategy to minimize inventory risk (unsold assets) and maximize short-term returns.
@@ -20,53 +20,68 @@ A boutique investment firm wants to integrate TCG collectibles into their portfo
 
 ---
 
-## 📊 2. Phase 2: Prepare
+## 2. Phase 2: Prepare
 
 ### Data Sourcing
 I utilized the **"E-commerce Pokemon Card Pricing Data"** dataset from Kaggle (authored by Kanchana1990). This dataset is highly valuable because it logs actual completed sales from international sellers, rather than speculative asking prices.
 
 ### Data Profile
-* **Size:** 537 rows and 34 columns.
+* **Size:** 537 rows and 34 columns (spanning from Column A to AH).
 * **Scope:** Covers singles from the original Base Set through the modern Scarlet & Violet era.
 * **Integrity (ROCCC):** The data is Reliable (real completed sales), Original (e-commerce API aggregation), Comprehensive (includes rarity, condition, and pricing metadata), Current, and properly Cited. All prices were normalized to USD.
 
 ---
 
-##  3. Phase 3: Process
+## 3. Phase 3: Process
 
 To prepare the dataset for visualization, I engineered a data cleaning and transformation pipeline using **Python (Pandas)** and **SQL**.
 
 ### Python Data Cleaning
-The initial cleaning phase focused on standardizing categorical variables, managing duplicates, and casting financial datatypes. Key steps included enforcing primary key constraints, parsing monetary columns from string artifacts to float arrays, and standardizing temporal data.
+The initial cleaning phase focused on standardizing categorical variables, managing duplicates based on key identifiers, and casting financial datatypes. Key steps included enforcing compound constraints to eliminate duplicate listings, parsing monetary columns from string artifacts to float arrays, and standardizing temporal data.
 
 ```python
 # Snippet: Data Wrangling & Integrity Checks (Pandas)
 
 import pandas as pd
 import numpy as np
+from google.colab import files
 
-def clean_pokemon_data(input_csv):
+def pokemon_cards_clean_100(input_csv):
+    print("--- STARTING PROCESS PHASE (DATA CLEANING) ---")
+
     # 1. Load data
     df = pd.read_csv(input_csv)
+    print(f"Initial raw rows loaded: {len(df)}")
 
-    # 2. Enforce Primary Key integrity (Remove exact duplicates)
-    df = df.drop_duplicates(subset=['card_id'], keep='first')
+    # 2. Remove exact duplicates based on the real identifying columns
+    df = df.drop_duplicates(subset=['title', 'card_number'], keep='first')
+    print(f"Rows remaining after removing duplicates: {len(df)}")
 
-    # 3. String normalization (strip whitespace)
-    df['card_name'] = df['card_name'].astype(str).str.strip()
-    df['set_name'] = df['set_name'].astype(str).str.strip()
-    df['rarity'] = df['rarity'].astype(str).str.strip()
+    # 3. String normalization (strip whitespace from real column names)
+    if 'pokemon_name' in df.columns:
+        df['pokemon_name'] = df['pokemon_name'].astype(str).str.strip()
+    if 'set_name' in df.columns:
+        df['set_name'] = df['set_name'].astype(str).str.strip()
+    if 'rarity_class' in df.columns:
+        df['rarity_class'] = df['rarity_class'].astype(str).str.strip()
 
-    # 4. Financial column cleanup (Strip currency symbols and cast to Float)
-    df['price_usd'] = df['price_usd'].astype(str).str.replace('\$', '', regex=False)
-    df['price_usd'] = pd.to_numeric(df['price_usd'], errors='coerce')
+    # 4. Financial column cleanup (remove '\$' and convert to Float)
+    if 'price_usd' in df.columns:
+        df['price_usd'] = df['price_usd'].astype(str).str.replace('\$', '', regex=False)
+        df['price_usd'] = pd.to_numeric(df['price_usd'], errors='coerce')
 
-    # 5. Temporal data casting (Ensure YYYY-MM-DD format while preserving valid NULLs)
-    df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce').dt.strftime('%Y-%m-%d')
+    # 5. Date formatting (Ensure YYYY-MM-DD format while preserving valid NULLs)
+    if 'release_date' in df.columns:
+        df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce').dt.strftime('%Y-%m-%d')
+    else:
+        df['release_date'] = np.nan
 
-    # 6. Null imputation for inventory tracking
-    df['stock'] = df['stock'].fillna(0).astype(int)
-    
+    # 6. Integrity checks for inventory tracking
+    if 'stock' in df.columns:
+        df['stock'] = df['stock'].fillna(0).astype(int)
+    else:
+        df['stock'] = 0
+
     return df
 ```
 
@@ -111,13 +126,13 @@ During the exploratory data analysis (EDA), several clear patterns emerged regar
 
 ---
 
-## 📊 5. Phase 5: Share
+## 5. Phase 5: Share
 
 To present these findings, I designed an interactive business intelligence dashboard in **Tableau Public**.
 
-[![View Interactive Dashboard](https://shields.io)](https://public.tableau.com/app/profile/jos.antonio.chong.contreras/viz/Pokemon_TCG_Market_Analysis/Dashboard1)
+[![View Interactive Dashboard](https://shields.io)](https://tableau.com)
 
-*👉 **[Click here to view the live interactive dashboard on Tableau Public](https://public.tableau.com/app/profile/jos.antonio.chong.contreras/viz/Pokemon_TCG_Market_Analysis/Dashboard1)***
+*👉 **[Click here to view the live interactive dashboard on Tableau Public](https://tableau.com)***
 
 ### UI/UX Design Approach
 I implemented a strict "Dark Mode" aesthetic using a deep midnight blue (`#06061E`) background paired with a high-contrast Orange and dark Red/Brown palette. To keep the interface clean, maximize the data-ink ratio, and focus the user's attention directly on the data points, I systematically removed all unnecessary gridlines and axis rulers.
@@ -131,7 +146,7 @@ I implemented a strict "Dark Mode" aesthetic using a deep midnight blue (`#06061
 ### Dashboard Preview
 ![Tableau Dashboard](Dashboard%201.png)
 
-
+---
 
 ## 6. Phase 6: Act
 
