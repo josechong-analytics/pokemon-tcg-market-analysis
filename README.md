@@ -28,15 +28,17 @@ I utilized the **"E-commerce Pokemon Card Pricing Data"** dataset from Kaggle (a
 ### Data Profile
 * **Size:** 537 rows and 34 columns (spanning from Column A to AH).
 * **Scope:** Covers singles from the original Base Set through the modern Scarlet & Violet era.
-* **Integrity (ROCCC):** The data is Reliable (real completed sales), Original (e-commerce API aggregation), Comprehensive (includes rarity, condition, and pricing metadata), Current, and properly Cited. All prices were normalized to USD.
+* **Integrity (ROCCC):** The data is Reliable (real completed sales), Original (e-commerce API aggregation), Comprehensive (includes pricing and condition metadata), Current, and properly Cited. All prices were normalized to USD.
+* **Data Quality Note:** An initial structural audit revealed a significant volume of missing classification metadata within the `rarity_class` column, preserved as **"Unknown"**. To maintain financial sample size and avoid distorting aggregate market value or sales velocity calculations, these rows were preserved during processing rather than dropped.
 
 ---
+
 ## 3. Phase 3: Process
 
 To prepare the dataset for enterprise-grade data warehousing and BI visualization, I developed a dual-stage data processing strategy using Python (Pandas & Regex).
 
 ### Stage 1: Exploratory Data Cleaning & Deduplication
-In the initial processing stage (documented in `data_cleaning_process.ipynb`), I focused on auditing data quality and establishing structural integrity. 
+In the initial processing stage (documented in `data_cleaning_process.ipynb`), I focused on auditing data quality and establishing structural integrity.
 * **Deduplication:** Instead of relying on missing or inconsistent arbitrary IDs, I enforced a compound constraint using `subset=['title', 'card_number']` to effectively eliminate identical listing duplicates and ensure row-level uniqueness.
 * **String Normalization:** Whitespace and structural text anomalies were stripped across core fields.
 * **Type Casting:** Financial values were cleaned of string symbols and converted to float arrays, and temporal data was standardized to standard date formats.
@@ -70,7 +72,6 @@ def clean_pokemon_market_data(input_filepath, output_filepath):
 ```
 
 *(Both notebooks are fully documented and available in the main directory of this repository: use `data_cleaning_process.ipynb` for the business logic validation and `etl_pipeline.ipynb` for the automated API ingestion workflow).*
-
 
 ### SQL: Exploratory Data Analysis (EDA) & Validation
 Before building the BI dashboard, I loaded the cleaned dataset into **Google BigQuery** to perform exploratory data analysis and validate business logic.
@@ -108,6 +109,7 @@ During the exploratory data analysis (EDA), several clear patterns emerged regar
 * **Market Liquidity:** The market moves extremely fast. The overall average time a card spends listed before selling is just **3.7 Days**.
 * **Value Concentration:** Nostalgia dictates total market cap. The vintage **Base Set** accounts for a dominant **$2,934.61** of the sample's value, proving that historical scarcity outperforms modern volume.
 * **The Grading Arbitrage:** Comparing Raw vs. Graded prices revealed a massive margin opportunity in modern cards. Grading a card does not just add a flat premium; for certain rarities, it acts as an aggressive multiplier.
+* **Metadata Limitation Segment:** The high frequency of **"Unknown"** labels within the rarity column represents lower-tier bulk items. Exploratory analysis confirms that these records do not distort premium asset behavior, shifting the high-yield analytical scope strictly toward verified tiers.
 
 ---
 
@@ -117,14 +119,14 @@ To present these findings, I designed an interactive business intelligence dashb
 
 [![View Interactive Dashboard](https://shields.io)](https://tableau.com)
 
-*👉 **[Click here to view the live interactive dashboard on Tableau Public](https://tableau.com)***
+***[Click here to view the live interactive dashboard on Tableau Public](https://tableau.com)***
 
 ### UI/UX Design Approach
 I implemented a strict "Dark Mode" aesthetic using a deep midnight blue (`#06061E`) background paired with a high-contrast Orange and dark Red/Brown palette. To keep the interface clean, maximize the data-ink ratio, and focus the user's attention directly on the data points, I systematically removed all unnecessary gridlines and axis rulers.
 
 ### Visual Breakdown
 * **Top 10 Sets (Bar Chart):** Clearly highlights the heavy financial weighting of the Base Set compared to the rest of the market.
-* **Liquidity Risk (Column Chart):** Shows that rarity does not slow down sales. The highly sought-after **SAR (Special Illustration Rare)** cards are actually the fastest movers, selling in just **2.8 days**.
+* **Liquidity Risk (Column Chart):** Shows that rarity does not slow down sales. The highly sought-after **SAR (Special Illustration Rare)** cards are actually the fastest movers, selling in just **2.857 days**. Unclassified **"Unknown"** card segments cluster tightly around the baseline market average of 3.4 days.
 * **Valuation Drivers (Heatmap):** This is the core insight tool. Using a custom color gradient, it illustrates the condition arbitrage opportunity. A raw SAR card averages **$184.88**, but jumps to a dark-red intensity of **$1,454.15** once graded.
 * **Price vs. Liquidity (Scatter Plot):** Plots sale price against days on market. It shows that high-ticket cards (>$1,000) sell in roughly **4 days**, effectively the exact same timeframe as $200 cards.
 
@@ -141,14 +143,17 @@ The core value of this data analysis is transforming raw metrics into high-yield
 1. **Capitalize on Modern Grading Arbitrage (High ROI/High Velocity)**
    * **The Insight:** The Valuation Drivers heatmap reveals that raw Special Illustration Rare (SAR) cards hold a modest market baseline of ~$184.88. However, upon receiving third-party professional grading, their realized value surges exponentially to an average of **$1,454.15**. Furthermore, the Liquidity Risk chart confirms that SAR cards are the absolute fastest-moving assets in the entire market, clearing inventory constraints in just **2.857 days**.
    * **The Action:** The firm must establish an active acquisition pipeline focusing on high-grade, raw modern SAR cards to execute third-party grading submissions, capturing massive arbitrage margins with zero structural liquidity risk.
-
-2. **Deploy Capital into High-Ticket Assets with Velocity Confidence**
+   * 
+   * 2. **Deploy Capital into High-Ticket Assets with Velocity Confidence**
    * **The Insight:** Traditional asset management assumes that luxury or high-ticket items suffer from severe liquidity traps (longer days on market). However, the Price vs. Liquidity scatter plot invalidates this assumption for the Pokémon TCG space. High-valuation assets valued above $1,000 exhibit a market clearance velocity of approximately **4 days**—effectively mirroring the liquidation timeline of low-tier $200 items.
    * **The Action:** Capital can be deployed into premier, high-value assets (>$1,000) without fear of locking up firm capital in illiquid inventory, enabling the acquisition of blue-chip collectibles that maintain rapid liquidation speeds.
 
 3. **Establish a Risk-Mitigation Anchor in Vintage Scarcity**
    * **The Insight:** While modern sets offer aggressive velocity, the Top 10 Sets volume distribution proves that market capitalization is overwhelmingly dictated by historical nostalgia. The vintage **Base Set** completely dominates total asset value within the sample at **$2,934.61**, heavily outperforming the aggregate value of modern modern expansions like Scarlet & Violet (SV2A) despite their higher transaction volume.
    * **The Action:** To hedge against the natural volatility and potential print-run inflation of modern sets, the firm should utilize 40% of the portfolio capital to acquire and hold vintage Base Set, Jungle, and Fossil assets as a long-term wealth preservation anchor.
+     
+ ## Future Scope
 
-### Future Scope
-To advance this research from retrospective analysis to predictive intelligence, the next phase of this project will integrate a machine learning time-series forecasting model using **Python (Prophet or ARIMA)**. This will allow the firm to quantify and forecast how the announcement and release dates of modern expansion sets dynamically impact the pricing pressure and market velocity of historical vintage assets.
+1. **Predictive Time-Series Modeling:** To advance this research from retrospective analysis to predictive intelligence, the next phase of this project will integrate a machine learning time-series forecasting model using **Python (Prophet or ARIMA)**. This will allow the firm to quantify and forecast how the announcement and release dates of modern expansion sets dynamically impact the pricing pressure and market velocity of historical vintage assets.
+2. **Metadata Enrichment Pipeline:** To resolve the volume of **"Unknown"** records identified within the `rarity_class` column during the data audit phase, the next iteration will implement an automated metadata enrichment script using Python. This script will programmatically interface with an external TCG API to map and backfill missing classification metrics based on compound `card_number` and `set_name` keys, elevating dataset completeness to 100%.
+
