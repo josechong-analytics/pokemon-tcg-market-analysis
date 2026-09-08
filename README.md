@@ -13,10 +13,20 @@ This project follows the **Ask, Prepare, Process, Analyze, Share, Act** framewor
 ### The Business Problem
 A boutique investment firm wants to integrate TCG collectibles into their portfolio but needs a data-driven strategy to minimize inventory risk (unsold assets) and maximize short-term returns.
 
-### Key Questions to Answer
-1. What is the average market liquidity (days to sell), and do more expensive cards take longer to sell?
-2. Which expansions hold the highest concentration of portfolio value?
-3. What is the true financial impact of submitting raw cards to grading services (e.g., PSA, CGC), and which rarity classes see the biggest benefit?
+### Key Questions to Answer (SMART Methodology Framework)
+To transition from abstract goals to data-driven solutions, the core business inquiries were re-engineered using the SMART framework to ensure every question is Specific, Measurable, Actionable, Relevant, and Time-bound:
+
+1. **Market Liquidity & Capital Velocity (Specific & Measurable)**
+   * *SMART Formulation:* What is the baseline market liquidity—quantified as the average days on market—across historical e-commerce transactions, and does an increase in transaction value above a $1,000 threshold correlate with an inventory turnover slowdown?
+   * *Business Objective:* Quantify asset velocity to ensure firm capital does not get trapped in illiquid high-ticket listings.
+
+2. **Portfolio Value Concentration (Actionable & Relevant)**
+   * *SMART Formulation:* Which specific set expansions and operational eras (Vintage vs. Modern) command the top concentration of total realized market value within the transaction sample?
+   * *Business Objective:* Pinpoint the precise product lines that retain the highest market capitalization to optimize asset allocation.
+
+3. **Condition Grading Arbitrage ROI (Actionable & Time-Bound)**
+   * *SMART Formulation:* What is the exact financial return on investment (ROI) multiplier achieved when shifting premium modern rarity classes from raw baselines to third-party professionally graded conditions within the logged transaction window?
+   * *Business Objective:* Build a concrete pricing strategy that justifies the upfront overhead costs of professional grading submissions.
 
 ---
 
