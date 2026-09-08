@@ -26,7 +26,7 @@ A boutique investment firm wants to integrate TCG collectibles into their portfo
 I utilized the **"E-commerce Pokemon Card Pricing Data"** dataset from Kaggle (authored by Kanchana1990). This dataset is highly valuable because it logs actual completed sales from international sellers, rather than speculative asking prices.
 
 ### Data Profile
-* **Size:** 542 rows and 32 columns.
+* **Size:** 537 rows and 34 columns.
 * **Scope:** Covers singles from the original Base Set through the modern Scarlet & Violet era.
 * **Integrity (ROCCC):** The data is Reliable (real completed sales), Original (e-commerce API aggregation), Comprehensive (includes rarity, condition, and pricing metadata), Current, and properly Cited. All prices were normalized to USD.
 
